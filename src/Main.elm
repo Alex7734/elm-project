@@ -8,7 +8,7 @@ import Html.Attributes exposing (href, type_)
 import Model exposing (AppState(..), Config, LoadingPostsState, Mode(..), Model, Msg(..))
 import Model.Post as Post
 import Model.PostIds as PostIds exposing (HackerNewsItem(..))
-import Model.PostsConfig
+import Model.PostsConfig as PostsConfig
 import View.Posts exposing (postTable, postsConfigView)
 
 
@@ -148,7 +148,12 @@ update msg model =
                             ( Model.FailedToLoad err, Effect.NoEffect )
 
                 ( Model.LoadedPosts state, ConfigChanged change ) ->
-                    ( Model.LoadedPosts state, Effect.NoEffect )
+                    let
+                        newConfig =
+                            PostsConfig.applyChanges change state.config
+                    in
+                        ( Model.LoadedPosts { state | config = newConfig }, Effect.NoEffect )
+
                 ( state, _ ) ->
                     ( state, Effect.NoEffect )
     in

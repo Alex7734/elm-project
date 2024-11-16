@@ -2,6 +2,7 @@ module Model.PostIds exposing (..)
 
 import Cursor exposing (Cursor)
 import Json.Decode as De
+import Cursor
 
 
 type HackerNewsItem
@@ -61,8 +62,7 @@ If the `Cursor` is focused on the last element, it returns `Nothing`
 advance : PostIds -> Maybe ( Int, PostIds )
 advance (PostIds ids) =
     Cursor.forward ids
-        |> Maybe.map (\nextCursor -> ( Cursor.current nextCursor, PostIds nextCursor ))
-
+        |> Maybe.map (\newIds -> ( Cursor.current newIds, PostIds newIds ))
 
 {-| Returns the first post id
 

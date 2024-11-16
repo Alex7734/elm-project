@@ -136,7 +136,7 @@ filterPosts config posts =
     posts
         |> List.filter (\post ->
             (not config.showJobs || post.type_ /= "job")
-                && (config.showTextOnly && post.url == Nothing || not config.showTextOnly)
+                && (not config.showTextOnly || post.url == Nothing)
            )
         |> List.sortWith (sortToCompareFn config.sortBy)
         |> List.take config.postsToShow
