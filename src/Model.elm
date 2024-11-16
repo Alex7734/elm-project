@@ -10,7 +10,7 @@ module Model exposing
     , initModel
     )
 
-import Cursor exposing (Cursor)
+import Cursor exposing (..)
 import Http
 import Model.Post exposing (Post)
 import Model.PostIds exposing (PostIds)

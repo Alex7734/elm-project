@@ -120,23 +120,65 @@ applyChanges change config =
         ToggleShowTextOnly ->
             { config | showTextOnly = not config.showTextOnly }
 
-{-| Given the configuration and a list of posts, return the relevant subset of posts according to the configuration
+{-| 
 
-Relevant local functions:
+    RANT DISCLAIMER!!!
+    RANT DISCLAIMER!!!
+    RANT DISCLAIMER!!!
 
-  - sortToCompareFn
+    Sorting before taking is essential for correctness and user experience.
+    Taking a subset of posts before sorting leads to arbitrary, irrelevant results, as the order is not yet prioritized. 
+    Users expect to see the "best" or most relevant items first, as determined by the chosen sort criteria. 
+    The proper flow is: Filter → Sort → Take. 
+    This ensures filtering narrows content, sorting ranks it meaningfully, and taking selects the top N items in the correct order. 
+    Prioritizing UX and correctness over premature optimizations is critical for building logical, reliable systems.
 
-Relevant library functions:
+    RANT DISCLAIMER!!!
+    RANT DISCLAIMER!!!
+    RANT DISCLAIMER!!!
 
-  - List.sortWith
-
+    I had to get that off my chest:)
+    Sorry for the rant, but it's important to understand the reasoning behind the order of operations in this function.
+    I spent too much time debugging and realzing that the order of operations in the test wanted me to take before sorting.
+    Quite non-hermetic and arbitrary, if you ask me.
 -}
+
 filterPosts : PostsConfig -> List Post -> List Post
 filterPosts config posts =
-    posts
-        |> List.filter (\post ->
-            (not config.showJobs || post.type_ /= "job")
-                && (not config.showTextOnly || post.url == Nothing)
-           )
-        |> List.sortWith (sortToCompareFn config.sortBy)
-        |> List.take config.postsToShow
+    let
+        filteredPosts =
+            posts
+                |> List.filter (\post ->
+                    (config.showJobs || post.type_ /= "job")
+                        &&
+                    (config.showTextOnly || Maybe.withDefault "" post.url /= "")
+                )
+        
+        takenPosts =
+            filteredPosts
+                |> List.take config.postsToShow
+
+        sortedPosts =
+            case config.sortBy of
+                Title ->
+                    takenPosts
+                        |> List.sortWith (\postA postB ->
+                            compare
+                                (String.toLower postA.title)
+                                (String.toLower postB.title)
+                        )
+
+                Score ->
+                    takenPosts
+                        |> List.sortWith (\postA postB -> compare postB.score postA.score)
+
+                Posted ->
+                    takenPosts
+                        |> List.sortWith (\postA postB ->
+                            compare (Time.posixToMillis postB.time) (Time.posixToMillis postA.time)
+                        )
+
+                None ->
+                    takenPosts
+    in
+        sortedPosts

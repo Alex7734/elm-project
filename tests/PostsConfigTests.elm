@@ -1,22 +1,17 @@
 module PostsConfigTests exposing (..)
 
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer)
-import Html exposing (select)
-import Html.Attributes
+import Expect exposing (..)
+import Fuzz exposing (..)
+import Html exposing (..)
 import Model exposing (Msg(..))
-import Model.Post exposing (Post)
+import Model.Post exposing (..)
 import Model.PostsConfig as Config exposing (defaultConfig)
 import PostsViewTests
 import Test exposing (..)
-import Test.Html.Event as Evt
-import Test.Html.Query as Q
-import Test.Html.Selector as S
 import TestData as Data
 import TestUtils
 import Time exposing (Month(..))
 import Util.Time exposing (Date(..))
-import View.Posts as Posts
 
 
 suite : Test
