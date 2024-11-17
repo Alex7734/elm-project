@@ -3,8 +3,8 @@ module Main exposing (devFlags, init, main, prodFlags, reactorMain, update, view
 import Browser
 import Dict exposing (update)
 import Effect exposing (Effect, performEffect)
-import Html exposing (Html, button, div, input, select, text)
-import Html.Attributes exposing (href, type_)
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (style)
 import Model exposing (AppState(..), Config, LoadingPostsState, Mode(..), Model, Msg(..))
 import Model.Post as Post
 import Model.PostIds as PostIds exposing (HackerNewsItem(..))
@@ -173,10 +173,10 @@ view model =
         body =
             case model.state of
                 Model.Empty _ ->
-                    div [] [ text "Loading" ]
+                    div [ style "text-align" "center", style "margin-top" "20px" ] [ text "Loading" ]
 
                 Model.FailedToLoad _ ->
-                    div [] [ text "Failed to load" ]
+                    div [ style "text-align" "center", style "margin-top" "20px", style "color" "red" ] [ text "Failed to load" ]
 
                 Model.LoadedPosts { config, time, posts } ->
                     div []
@@ -185,12 +185,15 @@ view model =
                         ]
 
                 Model.Loading _ ->
-                    div [] [ text "Loading stories" ]
+                    div [ style "text-align" "center", style "margin-top" "20px" ] [ text "Loading stories" ]
 
                 Model.LoadingPosts { currentId } ->
-                    div [] [ text <| "Loading post " ++ String.fromInt currentId ]
+                    div [ style "text-align" "center", style "margin-top" "20px" ] [ text <| "Loading post " ++ String.fromInt currentId ]
 
                 _ ->
-                    div [] [ text "Other" ]
+                    div [ style "text-align" "center", style "margin-top" "20px" ] [ text "Other" ]
     in
-    div [] [ Html.h1 [] [ text title ], body ]
+    div [ style "padding" "20px", style "font-family" "Arial, sans-serif" ]
+        [ Html.h1 [ style "text-align" "center", style "color" "#333" ] [ text title ]
+        , div [ style "max-width" "1200px", style "margin" "0 auto" ] [ body ]
+        ]

@@ -1,7 +1,7 @@
 module Util.Time exposing (..)
 
 import Time
-
+import Dict exposing (Dict)
 
 type Date
     = Date { year : Int, month : Time.Month, day : Int }
@@ -9,43 +9,39 @@ type Date
 
 monthToString : Time.Month -> String
 monthToString month =
-    case month of
-        Time.Jan ->
-            "Jan"
+    let
+        monthDict =
+            Dict.fromList
+                [ ("Jan", "Jan")
+                , ("Feb", "Feb")
+                , ("Mar", "Mar")
+                , ("Apr", "Apr")
+                , ("May", "May")
+                , ("Jun", "Jun")
+                , ("Jul", "Jul")
+                , ("Aug", "Aug")
+                , ("Sep", "Sep")
+                , ("Oct", "Oct")
+                , ("Nov", "Nov")
+                , ("Dec", "Dec")
+                ]
 
-        Time.Feb ->
-            "Feb"
-
-        Time.Mar ->
-            "Mar"
-
-        Time.Apr ->
-            "Apr"
-
-        Time.May ->
-            "May"
-
-        Time.Jun ->
-            "Jun"
-
-        Time.Jul ->
-            "Jul"
-
-        Time.Aug ->
-            "Aug"
-
-        Time.Sep ->
-            "Sep"
-
-        Time.Oct ->
-            "Oct"
-
-        Time.Nov ->
-            "Nov"
-
-        Time.Dec ->
-            "Dec"
-
+        monthKey =
+            case month of
+                Time.Jan -> "Jan"
+                Time.Feb -> "Feb"
+                Time.Mar -> "Mar"
+                Time.Apr -> "Apr"
+                Time.May -> "May"
+                Time.Jun -> "Jun"
+                Time.Jul -> "Jul"
+                Time.Aug -> "Aug"
+                Time.Sep -> "Sep"
+                Time.Oct -> "Oct"
+                Time.Nov -> "Nov"
+                Time.Dec -> "Dec"
+    in
+        Dict.get monthKey monthDict |> Maybe.withDefault "Unknown"
 
 posixToDate : Time.Zone -> Time.Posix -> Date
 posixToDate tz time =
@@ -72,18 +68,12 @@ posixToDate tz time =
 
 -}
 formatDate : Date -> String
-formatDate (Date date) =
-    let
-        year =
-            String.fromInt date.year
-
-        month =
-            monthToString date.month
-
-        day =
-            String.fromInt date.day |> String.padLeft 2 '0'
-    in
-    year ++ " " ++ month ++ " " ++ day
+formatDate (Date { year, month, day }) =
+    [ String.fromInt year
+    , monthToString month
+    , String.fromInt day |> String.padLeft 2 '0'
+    ]
+        |> String.join " "
 
 
 formatTime : Time.Zone -> Time.Posix -> String
@@ -191,20 +181,17 @@ durationBetween t1 t2 =
 
 -}
 formatDuration : Duration -> String
-formatDuration duration =
-    let
-        parts =
-            [ (duration.days, "day")
-            , (duration.hours, "hour")
-            , (duration.minutes, "minute")
-            , (duration.seconds, "second")
-            ]
-                |> List.filter (\(value, _) -> value > 0)
-                |> List.map (\(value, label) -> String.fromInt value ++ " " ++ label ++ (if value > 1 then "s" else ""))
-    in
-    case parts of
-        [] ->
-            "just now"
+formatDuration { seconds, minutes, hours, days } =
+    [ (days, "day")
+    , (hours, "hour")
+    , (minutes, "minute")
+    , (seconds, "second")
+    ]
+        |> List.filter (\(value, _) -> value > 0)
+        |> List.map (\(value, label) -> String.fromInt value ++ " " ++ label ++ (if value > 1 then "s" else ""))
+        |> \filteredParts -> case filteredParts of
+            [] ->
+                "just now"
 
-        _ ->
-            String.join " " parts ++ " ago"
+            parts ->
+                String.join " " parts ++ " ago"

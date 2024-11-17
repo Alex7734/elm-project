@@ -52,8 +52,7 @@ fromList list =
 -}
 toList : Cursor a -> List a
 toList (Cursor left mid right) =
-    List.reverse left ++ (mid :: right)
-
+    List.foldl (::) (mid :: right) left
 
 {-| Get the current element from the cursor
 
